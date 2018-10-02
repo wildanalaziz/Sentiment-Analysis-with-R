@@ -85,7 +85,7 @@ ggplot(subset(wfnegatif, freq>30), aes(x=reorder(word, -freq), y=freq))+
   geom_bar(stat='identity')
 
 
-#Train-test spli
+#Train-test split
 library(caret)
 library(e1071)
 
@@ -94,11 +94,12 @@ TrainData=cbind(as.data.frame(m[TrainIndex,]), sentiment=df$sentiment[TrainIndex
 XTest=as.data.frame(m[-TrainIndex,])
 YTest=as.factor(df$sentiment[-TrainIndex])
 
+#Model
 model=naiveBayes(formula=as.factor(TrainData$sentiment)~., data = TrainData)
 prediksi=predict(model,XTest)
 confusionMatrix(prediksi, YTest, mode='everything')
 
-##buang kata2 jarang muncul
+##buang kata2 jarang muncul, avoid overfitting
 dtm1=removeSparseTerms(dtm, 0.80)
 inspect(dtm1)
 m1=as.matrix(dtm1)
@@ -120,8 +121,11 @@ fit=hclust(distance, method = 'complete')
 plot(fit)
 rect.hclust(fit, k=6, border = 'red')
 
+library(fpc)   
+kfit <- kmeans(distance, 5)   
+clusplot(as.matrix(distance), kfit$cluster, color=T, shade=T, labels=2, lines=0)   
 
-##Menggabungkan semua file csv dalam satu folder
+##Menggabungkan semua file csv dalam satu folder jadi satu dataframe
 file_list=list.files( pattern = ".csv")
 file_list
 ALLAirlines=do.call(rbind, lapply(file_list, function(x) read.csv(x, sep=';')))
